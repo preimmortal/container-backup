@@ -17,9 +17,10 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: preimmortal/container-backup
-          tag-sha: true
-          tag-edge: false
-          tag-latest: true
+          tags: |
+            type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=sha,prefix={{branch}}-
+            type=raw,value=mytag-{{branch}}-{{sha}}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
