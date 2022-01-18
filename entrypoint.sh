@@ -25,14 +25,20 @@ if [ ! -z "${SQLITE_DATABASE_SOURCE}" ] && [ ! -z "${SQLITE_DATABASE_DEST}" ]; t
       echo .dump | sqlite3 ${SQLITE_DATABASE_SOURCE} | sqlite3 ${SQLITE_DATABASE_DEST}
       if [ "$?" == "0" ]; then
         echo "Successfully backed up file: ${SQLITE_DATABASE_SOURCE} -> ${SQLITE_DATABASE_DEST}"
+        chown --reference=${SQLITE_DATABASE_SOURCE} ${SQLITE_DATABASE_DEST}
+        chgrp --reference=${SQLITE_DATABASE_SOURCE} ${SQLITE_DATABASE_DEST}
+        chmod --reference=${SQLITE_DATABASE_SOURCE} ${SQLITE_DATABASE_DEST}
       else
         echo "ERROR: SQLite backup failed"
+        exit 1
       fi
     else
       echo "ERROR: The SQLite source and dest file are the same"
+      exit 1
     fi
   else
     echo "ERROR: The SQLITE_DATABASE_SOURCE file does not exist: ${SQLITE_DATABASE_SOURCE}"
+    exit 1
   fi
   echo ""
 fi
@@ -51,12 +57,15 @@ if [ ! -z "${RSYNC_SOURCE}" ] && [ ! -z "${RSYNC_DEST}" ]; then
         echo "Successfully backed source: ${RSYNC_SOURCE} -> ${RSYNC_DEST}"
       else
         echo "ERROR: Rsync command failed"
+        exit 1
       fi
     else
       echo "ERROR: The rsync source and dest is the same"
+      exit 1
     fi
   else
     echo "ERROR: The RSYNC_SOURCE does not exist: ${RSYNC_SOURCE}"
+    exit 1
   fi
   echo ""
 fi
