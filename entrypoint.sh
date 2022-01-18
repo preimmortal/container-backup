@@ -24,10 +24,11 @@ if [ ! -z "${SQLITE_DATABASE_SOURCE}" ] && [ ! -z "${SQLITE_DATABASE_DEST}" ]; t
     if [ "`readlink -f ${SQLITE_DATABASE_SOURCE}`" != "`readlink -f ${SQLITE_DATABASE_DEST}`" ]; then
       echo .dump | sqlite3 ${SQLITE_DATABASE_SOURCE} | sqlite3 ${SQLITE_DATABASE_DEST}
       if [ "$?" == "0" ]; then
-        echo "Successfully backed up file: ${SQLITE_DATABASE_SOURCE} -> ${SQLITE_DATABASE_DEST}"
+        echo "Fixing Permissions for backup file"
         chmod $( stat -c '%a' "${SQLITE_DATABASE_SOURCE}" ) "${SQLITE_DATABASE_DEST}"
         chown $( stat -c '%u' "${SQLITE_DATABASE_SOURCE}" ) "${SQLITE_DATABASE_DEST}"
         chgrp $( stat -c '%g' "${SQLITE_DATABASE_SOURCE}" ) "${SQLITE_DATABASE_DEST}"
+        echo "Successfully backed up file: ${SQLITE_DATABASE_SOURCE} -> ${SQLITE_DATABASE_DEST}"
       else
         echo "ERROR: SQLite backup failed"
         exit 1
