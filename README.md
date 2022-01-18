@@ -12,4 +12,7 @@ Get files from remote server within a `docker volume`:
 ## Sqlite Usage
 
     docker run --rm -v sourceTarget:/dataSource/ -v destTarget:/dataDest/ preimmortal/container-backup \
-             echo ".dump" | /dataSource/sqlite3 test.db| sqlite3 /dataDest/test.db
+             echo ".dump" | sqlite3 /dataSource/test.db | sqlite3 /dataDest/test.db
+
+    docker run --rm -v /path/to/source:/dataSource -v /path/to/dest:/dataDest preimmortal/container-backup \
+              sh -c 'echo ".dump" | sqlite3 /dataSource/db.sqlite3 | sqlite3 /dataDest/db.sqlite3'
