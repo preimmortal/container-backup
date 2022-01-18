@@ -25,9 +25,9 @@ if [ ! -z "${SQLITE_DATABASE_SOURCE}" ] && [ ! -z "${SQLITE_DATABASE_DEST}" ]; t
       echo .dump | sqlite3 ${SQLITE_DATABASE_SOURCE} | sqlite3 ${SQLITE_DATABASE_DEST}
       if [ "$?" == "0" ]; then
         echo "Successfully backed up file: ${SQLITE_DATABASE_SOURCE} -> ${SQLITE_DATABASE_DEST}"
-        chown --reference=${SQLITE_DATABASE_SOURCE} ${SQLITE_DATABASE_DEST}
-        chgrp --reference=${SQLITE_DATABASE_SOURCE} ${SQLITE_DATABASE_DEST}
-        chmod --reference=${SQLITE_DATABASE_SOURCE} ${SQLITE_DATABASE_DEST}
+        chmod $( stat -c '%a' "${SQLITE_DATABASE_SOURCE}" ) "${SQLITE_DATABASE_DEST}"
+        chown $( stat -c '%u' "${SQLITE_DATABASE_SOURCE}" ) "${SQLITE_DATABASE_DEST}"
+        chgrp $( stat -c '%g' "${SQLITE_DATABASE_SOURCE}" ) "${SQLITE_DATABASE_DEST}"
       else
         echo "ERROR: SQLite backup failed"
         exit 1
