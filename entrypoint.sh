@@ -69,3 +69,5 @@ if [ ! -z "${RSYNC_SOURCE}" ] && [ ! -z "${RSYNC_DEST}" ]; then
   fi
   echo ""
 fi
+
+exit 0
