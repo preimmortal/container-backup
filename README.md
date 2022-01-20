@@ -41,6 +41,16 @@ Backup files manually. Mount directories using `docker volume`
       -e SQLITE_DATABASE_DEST=/dataDest/test.db \
       preimmortal/container-backup
 
+## Backup Rsync Environment Example
+
+    docker run --rm \
+      -v /path/to/source:/dataSource \
+      -v /path/to/dest:/dataDest \
+      -e MIN_BACKUP_SOURCE=/dataSource/ \
+      -e MIN_BACKUP_DEST=/dataDest \
+      -e MIN_BACKUP_IGNORE_OPTIONS="*file1* *file2*" \
+      preimmortal/container-backup
+
 # Full Example
 
     docker run --rm \
