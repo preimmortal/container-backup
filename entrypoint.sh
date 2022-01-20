@@ -8,6 +8,9 @@ echo "  RSYNC_SOURCE: ${RSYNC_SOURCE}"
 echo "  RSYNC_DEST: ${RSYNC_DEST}"
 echo "  SQLITE_DATABASE_SOURCE: ${SQLITE_DATABASE_SOURCE}"
 echo "  SQLITE_DATABASE_DEST: ${SQLITE_DATABASE_DEST}"
+echo "  MIN_BACKUP_SOURCE: ${MIN_BACKUP_SOURCE}"
+echo "  MIN_BACKUP_DEST: ${MIN_BACKUP_DEST}"
+echo "  MIN_BACKUP_IGNORE_OPTIONS: ${MIN_BACKUP_IGNORE_OPTIONS}"
 echo ""
 
 #########################################################################
@@ -22,6 +25,7 @@ if [ ! -z "${SQLITE_DATABASE_SOURCE}" ] && [ ! -z "${SQLITE_DATABASE_DEST}" ]; t
       rm ${SQLITE_DATABASE_DEST}
     fi
     if [ "`readlink -f ${SQLITE_DATABASE_SOURCE}`" != "`readlink -f ${SQLITE_DATABASE_DEST}`" ]; then
+      echo "echo .dump | sqlite3 ${SQLITE_DATABASE_SOURCE} | sqlite3 ${SQLITE_DATABASE_DEST}"
       echo .dump | sqlite3 ${SQLITE_DATABASE_SOURCE} | sqlite3 ${SQLITE_DATABASE_DEST}
       if [ "$?" == "0" ]; then
         echo "Fixing Permissions for backup file"
@@ -53,6 +57,7 @@ if [ ! -z "${RSYNC_SOURCE}" ] && [ ! -z "${RSYNC_DEST}" ]; then
   echo "Detected Rsync backup request"
   if [ -f "${RSYNC_SOURCE}" ] || [ -d "${RSYNC_SOURCE}" ]; then
     if [ "`readlink -f ${RSYNC_SOURCE}`" != "`readlink -f ${RSYNC_DEST}`" ]; then
+      echo "rsync -avzh ${RSYNC_SOURCE} ${RSYNC_DEST}"
       rsync -avzh ${RSYNC_SOURCE} ${RSYNC_DEST}
       if [ "$?" == 0 ]; then
         echo "Successfully backed source: ${RSYNC_SOURCE} -> ${RSYNC_DEST}"
@@ -70,5 +75,43 @@ if [ ! -z "${RSYNC_SOURCE}" ] && [ ! -z "${RSYNC_DEST}" ]; then
   fi
   echo ""
 fi
+
+#########################################################################
+# Minimal Backup Backup
+#########################################################################
+if [ ! -z "${MIN_BACKUP_SOURCE}" ] && [ ! -z "${MIN_BACKUP_DEST}" ]; then
+  echo ""
+  echo "Detected Rsync backup request"
+  if [ -f "${MIN_BACKUP_SOURCE}" ] || [ -d "${MIN_BACKUP_SOURCE}" ]; then
+    if [ "`readlink -f ${MIN_BACKUP_SOURCE}`" != "`readlink -f ${MIN_BACKUP_DEST}`" ]; then
+
+      declare -a excludes
+
+      OPTIONS=($MIN_BACKUP_IGNORE_OPTIONS)
+
+      for i in "${OPTIONS[@]}"
+      do
+        excludes+=( --exclude="$i" )
+      done
+
+      echo "rsync -avh ${excludes[@]} ${MIN_BACKUP_SOURCE} ${MIN_BACKUP_DEST}"
+      rsync -avh "${excludes[@]}" --delete --delete-excluded ${MIN_BACKUP_SOURCE} ${MIN_BACKUP_DEST}
+      if [ "$?" == 0 ]; then
+        echo "Successfully backed source: ${MIN_BACKUP_SOURCE} -> ${MIN_BACKUP_DEST}"
+      else
+        echo "ERROR: Rsync command failed"
+        exit 1
+      fi
+    else
+      echo "ERROR: The rsync source and dest is the same"
+      exit 1
+    fi
+  else
+    echo "ERROR: The MIN_BACKUP_SOURCE does not exist: ${MIN_BACKUP_SOURCE}"
+    exit 1
+  fi
+  echo ""
+fi
+
 
 exit 0
