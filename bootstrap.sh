@@ -22,4 +22,4 @@ else
     "${USER}"
 fi
 
-su - ${USER} -c /entrypoint.sh
+su ${USER} -c /entrypoint.sh
