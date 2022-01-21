@@ -125,6 +125,7 @@ min_backup() {
 main() {
   if [ -n "${BACKUP_INTERVAL}" ]; then
     if (( ${BACKUP_INTERVAL} > 0 )); then
+      echo "Backuping up with interval: ${BACKUP_INTERVAL}"
       while true; do
         sqlite_backup
         rsync_backup
