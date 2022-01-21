@@ -6,7 +6,6 @@ ENV USERGROUP=backup
 ENV PUID=1000
 ENV PGID=1000
 
-COPY bootstrap.sh /
 COPY entrypoint.sh /
 
-ENTRYPOINT [ "/bootstrap.sh" ]
+ENTRYPOINT [ "/entrypoint.sh" ]
