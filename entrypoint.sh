@@ -37,18 +37,19 @@ sqlite_backup() {
           echo "Successfully backed up file: ${SQLITE_DATABASE_SOURCE} -> ${SQLITE_DATABASE_DEST}"
         else
           echo "ERROR: SQLite backup failed"
-          exit 1
+          return 1
         fi
       else
         echo "ERROR: The SQLite source and dest file are the same"
-        exit 1
+        return 1
       fi
     else
       echo "ERROR: The SQLITE_DATABASE_SOURCE file does not exist: ${SQLITE_DATABASE_SOURCE}"
-      exit 1
+      return 1
     fi
     echo ""
   fi
+  return 0
 }
 
 
@@ -68,18 +69,19 @@ rsync_backup() {
           echo "Successfully backed source: ${RSYNC_SOURCE} -> ${RSYNC_DEST}"
         else
           echo "ERROR: Rsync command failed"
-          exit 1
+          return 1
         fi
       else
         echo "ERROR: The rsync source and dest is the same"
-        exit 1
+        return 1
       fi
     else
       echo "ERROR: The RSYNC_SOURCE does not exist: ${RSYNC_SOURCE}"
-      exit 1
+      return 1
     fi
     echo ""
   fi
+  return 0
 }
 
 min_backup() {
@@ -107,18 +109,19 @@ min_backup() {
           echo "Successfully backed source: ${MIN_BACKUP_SOURCE} -> ${MIN_BACKUP_DEST}"
         else
           echo "ERROR: Rsync command failed"
-          exit 1
+          return 1
         fi
       else
         echo "ERROR: The rsync source and dest is the same"
-        exit 1
+        return 1
       fi
     else
       echo "ERROR: The MIN_BACKUP_SOURCE does not exist: ${MIN_BACKUP_SOURCE}"
-      exit 1
+      return 1
     fi
     echo ""
   fi
+  return 0
 }
 
 
@@ -128,21 +131,30 @@ main() {
       echo "Backuping up with interval: ${BACKUP_INTERVAL}"
       while true; do
         sqlite_backup
+        sqlite_backup_retval=$?
         rsync_backup
+        rsync_backup_retval=$?
         min_backup
+        min_backup_retval=$?
+        if [ "$(( sqlite_backup_retval | rsync_backup_retval | min_backup_retval ))" == "1" ]; then
+          echo "WARNING: A sync failed"
+        fi
         sleep ${BACKUP_INTERVAL}
       done
     else
       echo "ERROR: The BACKUP_INTERVAL is 0 or an invalid number"
-      exit 1
+      return 1
     fi
   else
     sqlite_backup
+    sqlite_backup_retval=$?
     rsync_backup
+    rsync_backup_retval=$?
     min_backup
+    min_backup_retval=$?
+    return $(( sqlite_backup_retval | rsync_backup_retval | min_backup_retval ))
   fi
 }
 
 main
-
-exit 0
+exit $?
