@@ -18,7 +18,7 @@ Backup files manually. Mount directories using `docker volume`
 
 # Automated Usage using Environment Variables
 
-- `BACKUP_INTERVAL` Run in Daemon Mode. Specify a number greater than 1 as the backup interval
+- `BACKUP_INTERVAL` Run in Daemon Mode. Specify a number greater than 1 as the backup interval in seconds
 - `SQLITE_DATABASE_SOURCE` SQLite Database Source
 - `SQLITE_DATABASE_DEST` SQLite Database Dest
 - `RSYNC_SOURCE` Rsync Source directory or file
@@ -56,6 +56,14 @@ Backup files manually. Mount directories using `docker volume`
       preimmortal/container-backup
 
 # Run in Daemon mode in an interval
+
+    docker run --rm \
+      -v /path/to/source:/dataSource \
+      -v /path/to/dest:/dataDest \
+      -e BACKUP_INTERVAL="60" \
+      -e RSYNC_SOURCE=/dataSource/ \
+      -e RSYNC_DEST=/dataDest \
+      preimmortal/container-backup
 
 # Full Example
 
