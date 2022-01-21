@@ -18,10 +18,14 @@ Backup files manually. Mount directories using `docker volume`
 
 # Automated Usage using Environment Variables
 
+- `BACKUP_INTERVAL` Run in Daemon Mode. Specify a number greater than 1 as the backup interval
 - `SQLITE_DATABASE_SOURCE` SQLite Database Source
 - `SQLITE_DATABASE_DEST` SQLite Database Dest
 - `RSYNC_SOURCE` Rsync Source directory or file
 - `RSYNC_DEST` Rsync Destination
+- `MIN_BACKUP_SOURCE` Minimal backup source
+- `MIN_BACKUP_DEST` Minimal backup dest
+- `MIN_BACKUP_IGNORE_OPTIONS` Minimal backup ignore names (space separated) i.e. ignoreFile1 ignoreFile2 ...
 
 ## Rsync Environment Example
 
@@ -50,6 +54,8 @@ Backup files manually. Mount directories using `docker volume`
       -e MIN_BACKUP_DEST=/dataDest \
       -e MIN_BACKUP_IGNORE_OPTIONS="*file1* *file2*" \
       preimmortal/container-backup
+
+# Run in Daemon mode in an interval
 
 # Full Example
 
