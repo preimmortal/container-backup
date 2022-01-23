@@ -7,6 +7,7 @@ echo "entrypoint.sh"
 echo "  BACKUP_INTERVAL: ${BACKUP_INTERVAL}"
 echo "  RSYNC_SOURCE: ${RSYNC_SOURCE}"
 echo "  RSYNC_DEST: ${RSYNC_DEST}"
+echo "  RSYNC_IGNORE_OPTIONS: ${RSYNC_IGNORE_OPTIONS}"
 echo "  SQLITE_DATABASE_SOURCE: ${SQLITE_DATABASE_SOURCE}"
 echo "  SQLITE_DATABASE_DEST: ${SQLITE_DATABASE_DEST}"
 echo "  MIN_BACKUP_SOURCE: ${MIN_BACKUP_SOURCE}"
@@ -63,8 +64,17 @@ rsync_backup() {
     echo "Detected Rsync backup request"
     if [ -f "${RSYNC_SOURCE}" ] || [ -d "${RSYNC_SOURCE}" ]; then
       if [ "`readlink -f ${RSYNC_SOURCE}`" != "`readlink -f ${RSYNC_DEST}`" ]; then
-        echo "rsync -avzh ${RSYNC_SOURCE} ${RSYNC_DEST}"
-        rsync -avzh ${RSYNC_SOURCE} ${RSYNC_DEST}
+        declare -a excludes
+
+        OPTIONS=($RSYNC_IGNORE_OPTIONS)
+
+        for i in "${OPTIONS[@]}"
+        do
+          excludes+=( --exclude="$i" )
+        done
+
+        echo "rsync -avh ${excludes[@]} --delete ${RSYNC_SOURCE} ${RSYNC_DEST}"
+        rsync -avh "${excludes[@]}" --delete ${RSYNC_SOURCE} ${RSYNC_DEST}
         if [ "$?" == 0 ]; then
           echo "Successfully backed source: ${RSYNC_SOURCE} -> ${RSYNC_DEST}"
         else
@@ -103,7 +113,7 @@ min_backup() {
           excludes+=( --exclude="$i" )
         done
 
-        echo "rsync -avh ${excludes[@]} ${MIN_BACKUP_SOURCE} ${MIN_BACKUP_DEST}"
+        echo "rsync -avh ${excludes[@]} --delete --delete-excluded ${MIN_BACKUP_SOURCE} ${MIN_BACKUP_DEST}"
         rsync -avh "${excludes[@]}" --delete --delete-excluded ${MIN_BACKUP_SOURCE} ${MIN_BACKUP_DEST}
         if [ "$?" == 0 ]; then
           echo "Successfully backed source: ${MIN_BACKUP_SOURCE} -> ${MIN_BACKUP_DEST}"
