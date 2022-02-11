@@ -73,8 +73,8 @@ rsync_backup() {
           excludes+=( --exclude="$i" )
         done
 
-        echo "rsync -avh ${excludes[@]} --delete ${RSYNC_SOURCE} ${RSYNC_DEST}"
-        rsync -avh "${excludes[@]}" --delete ${RSYNC_SOURCE} ${RSYNC_DEST}
+        echo "rsync -avh ${excludes[@]} --no-owner --no-group --delete ${RSYNC_SOURCE} ${RSYNC_DEST}"
+        rsync -avh "${excludes[@]}" --no-owner --no-group --delete ${RSYNC_SOURCE} ${RSYNC_DEST}
         if [ "$?" == 0 ]; then
           echo "Successfully backed source: ${RSYNC_SOURCE} -> ${RSYNC_DEST}"
         else
@@ -113,8 +113,8 @@ min_backup() {
           excludes+=( --exclude="$i" )
         done
 
-        echo "rsync -avh ${excludes[@]} --delete --delete-excluded ${MIN_BACKUP_SOURCE} ${MIN_BACKUP_DEST}"
-        rsync -avh "${excludes[@]}" --delete --delete-excluded ${MIN_BACKUP_SOURCE} ${MIN_BACKUP_DEST}
+        echo "rsync -avh ${excludes[@]} --no-owner --no-group --delete --delete-excluded ${MIN_BACKUP_SOURCE} ${MIN_BACKUP_DEST}"
+        rsync -avh "${excludes[@]}" --no-owner --no-group --delete --delete-excluded ${MIN_BACKUP_SOURCE} ${MIN_BACKUP_DEST}
         if [ "$?" == 0 ]; then
           echo "Successfully backed source: ${MIN_BACKUP_SOURCE} -> ${MIN_BACKUP_DEST}"
         else
